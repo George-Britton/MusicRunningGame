@@ -24,6 +24,10 @@ public:
 	UPROPERTY()
 		bool MeshSet = false;
 
+	// The collision layer for the bar
+	UPROPERTY()
+		UBoxComponent* BoxCollisionComponent;
+
 	// The key needed to avoid the bar
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
 	   FKey Key;

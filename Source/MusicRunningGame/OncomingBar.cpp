@@ -12,7 +12,9 @@ AOncomingBar::AOncomingBar()
 	//Creates the default objects and attaches to root
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->BarMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarMesh"));
+	this->BoxCollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BarMeshComponent->SetupAttachment(this->RootComponent);
+	BoxCollisionComponent->SetupAttachment(this->RootComponent);
 
 	this->bGenerateOverlapEventsDuringLevelStreaming = true;
 	BarMeshComponent->SetCollisionProfileName("OverlapAll");
@@ -21,7 +23,11 @@ AOncomingBar::AOncomingBar()
 // Called every time a value is changed
 void AOncomingBar::OnConstruction(const FTransform &trans)
 {
-	if (BarMesh){BarMeshComponent->SetStaticMesh(BarMesh);}
+	if (BarMesh)
+	{
+		BarMeshComponent->SetStaticMesh(BarMesh);
+		BoxCollisionComponent->SetWorldScale3D(FVector(BarMeshComponent->GetComponentScale()));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,9 +55,8 @@ void AOncomingBar::Tick(float DeltaTime)
 // Called when the bar hits anything
 void AOncomingBar::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if(OtherActor->GetName() == "Player")
-	{
-		APlayerPawn* PlayerRef = Cast<APlayerPawn>(OtherActor);
-		PlayerRef->HitByOncomingBar(this, Key, Damage);
-	}
+	GEngine->AddOnScreenDebugMessage(1, 15.0f, FColor::Red, "I am being notified of a hit.");
+
+	APlayerPawn* PlayerRef = Cast<APlayerPawn>(OtherActor);
+	if (PlayerRef){	PlayerRef->HitByOncomingBar(this, Key, Damage); }
 }
