@@ -4,28 +4,8 @@
 
 #include "Components/ActorComponent.h"
 #include "Engine.h"
+#include "BossAttackData.h"
 #include "SongData.generated.h"
-
-
-USTRUCT(BlueprintType)
-struct FClipData
-{
-	GENERATED_BODY()
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString ClipName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<float> TimeStampsOfAttacks;
-
-	FClipData()
-	{
-		ClipName = FString("N/A");
-		TimeStampsOfAttacks.Init(1, 1);
-	}
-};
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MUSICRUNNINGGAME_API USongData : public UActorComponent

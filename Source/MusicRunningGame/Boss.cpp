@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
+
 #include "Boss.h"
 
 
@@ -27,12 +29,15 @@ void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(!PlayerReference){GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("Please add a player reference"));}
-
-	// Creates a timer delegate and uses it in a timed Attack event
-		FTimerDelegate del;
-		del.BindUObject(this, &ABoss::Attack);
-		GetWorld()->GetTimerManager().SetTimer(AttackTimer, del, AttackTimingInSeconds, true, 0);
+	if(MusicManagerReference)
+	{
+		MusicManagerReference->ProjectileTelegraphTime = ProjectileTelegraphTime;
+		MusicManagerReference->BeamTelegraphTime = BeamTelegraphTime;
+		MusicManagerReference->WaveTelegraphTime = WaveTelegraphTime;
+		MusicManagerReference->MeleeTelegraphTime = MeleeTelegraphTime;
+		MusicManagerReference->ConeTelegraphTime = ConeTelegraphTime;
+		MusicManagerReference->BossReference = this;
+	}
 
 }
 
@@ -41,15 +46,10 @@ void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Keeps the boss behind the player
-	if(PlayerReference)
-	{
-		this->SetActorLocation(FVector(GetActorLocation().X, PlayerReference->GetActorLocation().Y, GetActorLocation().Z));
-	}
 }
 
 // Called on every bar of music for the attack
-void ABoss::Attack()
+void ABoss::Attack(EAttackType BossAttackType)
 {
-	
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("BossAttack"));
 }

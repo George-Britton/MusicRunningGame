@@ -5,8 +5,10 @@
 #include "GameFramework/Actor.h"
 #include "Engine.h"
 #include "BossAttackData.h"
+#include "MusicManager.h"
 #include "Boss.generated.h"
 
+class AMusicManager;
 
 UCLASS()
 class MUSICRUNNINGGAME_API ABoss : public AActor
@@ -18,36 +20,30 @@ public:
 	ABoss();
 
 	// The Static mesh that will temporarily act as the boss image
-	UPROPERTY(EditAnywhere, Category = "Boss Appearance", BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, Category = "Appearance", BlueprintReadWrite)
 		UStaticMesh * BossBallTemp;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Appearance", BlueprintReadWrite)
 		UStaticMeshComponent * BossBallTempComponent;
 
-	// A reference to the player
+	// Reference to the player
 	UPROPERTY(EditAnywhere, Category = "Player")
 		AActor * PlayerReference;
 
-	// A reference to the attack data file
-	UPROPERTY()
-		UBossAttackData* BossAttackComp;
+	// Reference to the music manager
+	UPROPERTY(EditAnywhere, Category = "Player")
+		AMusicManager* MusicManagerReference;
 
-	// Timer handle with details about the Attack event
-	UPROPERTY()
-		FTimerHandle AttackTimer;
-
-	// Timing of attacks to the music (in seconds)
-	UPROPERTY(EditAnywhere, Category = "Attack", BlueprintReadWrite)
-		float AttackTimingInSeconds = 3;
-
-	// Array of all of the boss' attacks
-	UPROPERTY(EditAnywhere, Category = "Attack", BlueprintReadWrite)
-		TArray<FAttackData> BossAttacks;
-
-	// Upcoming attacks
-	UPROPERTY()
-		uint8 UpcomingAttack;
-	UPROPERTY()
-		uint8 QueuedAttack;
+	// How long the boss needs to telegraph each attack type
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float ProjectileTelegraphTime = 0;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float BeamTelegraphTime = 0;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float WaveTelegraphTime = 0;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float MeleeTelegraphTime = 0;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float ConeTelegraphTime = 0;
 
 protected:
 	// Called when the game starts or when spawned
@@ -61,7 +57,7 @@ public:
 	virtual void OnConstruction(const FTransform &trans) override;
 
 	// Called on every bar of music for the attack
-	UFUNCTION(Category = "Attack")
-		void Attack();
+	UFUNCTION()
+		void Attack(EAttackType AttackType);
 	
 };

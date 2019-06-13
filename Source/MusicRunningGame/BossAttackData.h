@@ -18,28 +18,22 @@ enum class EAttackType : uint8 {
 };
 
 USTRUCT(BlueprintType)
-struct FAttackData
+struct FAttackTime
 {
 	GENERATED_BODY()
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString AttackName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EAttackType AttackType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FClipData MusicClip;
+		float TimeStampInSeconds;
 
-	FAttackData()
+	FAttackTime()
 	{
-		AttackName = FString("N/A");
 		AttackType = EAttackType::NoneAttackType;
-		FClipData MusicClip;
+		TimeStampInSeconds = 0;
 	}
 };
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MUSICRUNNINGGAME_API UBossAttackData : public UActorComponent
