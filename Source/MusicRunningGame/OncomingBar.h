@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Engine.h"
+#include "PlayerPawn.h"
 #include "OncomingBar.generated.h"
 
 UCLASS()
@@ -31,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 		float Speed = 5;
 
+	// Damage the bar inflicts on the player
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+		float Damage = 3;
 
 protected:
 	// Called when the game starts or when spawned

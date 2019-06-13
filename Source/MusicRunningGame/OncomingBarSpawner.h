@@ -20,10 +20,14 @@ struct FBarData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FKey Key;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Damage;
+
 	FBarData()
 	{
 		BarMesh = nullptr;
 		FKey Key;
+		Damage = 0;
 	}
 
 };

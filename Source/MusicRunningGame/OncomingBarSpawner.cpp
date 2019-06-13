@@ -62,6 +62,7 @@ void AOncomingBarSpawner::Spawn()
 	int32 ChosenBar = FMath::RandRange(0, BarDetails.Num() - 1);
 	BarRef->BarMesh = BarDetails[ChosenBar].BarMesh;
 	BarRef->Key = BarDetails[ChosenBar].Key;
+	BarRef->Damage = BarDetails[ChosenBar].Damage;
 	BarRef->Speed = Speed;
 
 }

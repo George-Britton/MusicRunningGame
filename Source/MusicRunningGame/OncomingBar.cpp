@@ -13,6 +13,9 @@ AOncomingBar::AOncomingBar()
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->BarMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarMesh"));
 	BarMeshComponent->SetupAttachment(this->RootComponent);
+
+	this->bGenerateOverlapEventsDuringLevelStreaming = true;
+	BarMeshComponent->SetCollisionProfileName("OverlapAll");
 }
 
 // Called every time a value is changed
@@ -44,4 +47,11 @@ void AOncomingBar::Tick(float DeltaTime)
 }
 
 // Called when the bar hits anything
-void AOncomingBar::NotifyActorBeginOverlap(AActor* OtherActor){}
+void AOncomingBar::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if(OtherActor->GetName() == "Player")
+	{
+		APlayerPawn* PlayerRef = Cast<APlayerPawn>(OtherActor);
+		PlayerRef->HitByOncomingBar(this, Key, Damage);
+	}
+}
