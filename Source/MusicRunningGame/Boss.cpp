@@ -52,4 +52,50 @@ void ABoss::Tick(float DeltaTime)
 void ABoss::Attack(EAttackType BossAttackType)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("BossAttack"));
+
+	switch (BossAttackType)
+	{
+	case EAttackType::ProjectileAttackType : SpawnProjectile(); break;
+	case EAttackType::BeamAttackType : SpawnBeam(); break;
+	case EAttackType::WaveAttackType : SpawnWave(); break;
+	}
+}
+void ABoss::SpawnProjectile()
+{
+	const FVector SpawnLoc = GetActorLocation();
+	const FRotator SpawnRot(FQuat::Identity);
+	FActorSpawnParameters SpawnParams;
+
+	// Gets a reference to the new projectile and gives it the preset variables
+	AProjectile* ProjectileRef = GetWorld()->SpawnActor<AProjectile>(ProjectileActor, SpawnLoc, SpawnRot, SpawnParams);
+	ProjectileRef->Mesh = ProjectileMesh;
+	ProjectileRef->Damage = ProjectileDamage;
+	ProjectileRef->Speed = ProjectileSpeed;
+	ProjectileRef->PlayerReference = PlayerReference;
+}
+void ABoss::SpawnBeam()
+{
+	const FVector SpawnLoc = GetActorLocation();
+	const FRotator SpawnRot(FQuat::Identity);
+	FActorSpawnParameters SpawnParams;
+
+	// Gets a reference to the new projectile and gives it the preset variables
+	ABeam* BeamRef = GetWorld()->SpawnActor<ABeam>(BeamActor, SpawnLoc, SpawnRot, SpawnParams);
+	BeamRef->Mesh = BeamMesh;
+	BeamRef->Damage = BeamDamage;
+	BeamRef->Duration = BeamDuration;
+	BeamRef->PlayerReference = PlayerReference;
+}
+void ABoss::SpawnWave()
+{
+	const FVector SpawnLoc = GetActorLocation();
+	const FRotator SpawnRot(FQuat::Identity);
+	FActorSpawnParameters SpawnParams;
+
+	// Gets a reference to the new projectile and gives it the preset variables
+	AWave* WaveRef = GetWorld()->SpawnActor<AWave>(WaveActor, SpawnLoc, SpawnRot, SpawnParams);
+	WaveRef->Mesh = WaveMesh;
+	WaveRef->Damage = WaveDamage;
+	WaveRef->Speed = WaveSpeed;
+	WaveRef->PlayerReference = PlayerReference;
 }
