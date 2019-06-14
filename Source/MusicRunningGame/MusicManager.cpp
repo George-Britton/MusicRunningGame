@@ -27,6 +27,11 @@ void AMusicManager::BeginPlay()
 		MusicPlayer->SetSound(MusicClips[ClipToPlay].MusicClip);
 		MusicPlayer->Play();
 
+		GetWorld()->GetTimerManager().SetTimer(MusicTimer, this, &AMusicManager::PlayNextClip, MusicClips[ClipToPlay].MusicClip->GetDuration(), false);
+
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds, false);
+
+		/*
 		FTimerDelegate StartingDelegate;
 		StartingDelegate.BindUObject(this, &AMusicManager::PlayNextClip);
 		GetWorld()->GetTimerManager().SetTimer(MusicTimer, StartingDelegate, 0, false,  MusicClips[ClipToPlay].MusicClip->GetDuration());
@@ -34,6 +39,7 @@ void AMusicManager::BeginPlay()
 		FTimerDelegate AttackDelegate;
 		AttackDelegate.BindUObject(this, &AMusicManager::PrepareForAttack);
 		GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0, false,  MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds);
+		*/
 	}
 }
 
@@ -46,9 +52,7 @@ void AMusicManager::PlayNextClip()
 	ClipToPlay = FMath::RandRange(0, MusicClips.Num()-1);
 	MusicPlayer->SetSound(MusicClips[ClipToPlay].MusicClip);
 
-	FTimerDelegate MusicDelegate;
-	MusicDelegate.BindUObject(this, &AMusicManager::PlayNextClip);
-	GetWorld()->GetTimerManager().SetTimer(MusicTimer, MusicDelegate, 0, false,  MusicClips[ClipToPlay].MusicClip->GetDuration());
+	GetWorld()->GetTimerManager().SetTimer(MusicTimer, this, &AMusicManager::PlayNextClip, MusicClips[ClipToPlay].MusicClip->GetDuration(), false);
 }
 
 // Called when the boss needs to be told to attack
@@ -61,15 +65,11 @@ void AMusicManager::PrepareForAttack()
 
 	if(NextEntryToRead++ < MusicClips[ClipToPlay].TimeStampsOfAttacks.Num() && NextEntryToRead){
 		NextEntryToRead++;
-		FTimerDelegate AttackDelegate;
-		AttackDelegate.BindUObject(this, &AMusicManager::PrepareForAttack);
-		float HowLongToWait = MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds - MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead--].TimeStampInSeconds;
-		GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0, false,  MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds);
+		float HowLongToWait = (MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds) - (MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead--].TimeStampInSeconds);
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, HowLongToWait, false);
 	}else if(NextEntryToRead++ < MusicClips[ClipToPlay].TimeStampsOfAttacks.Num() && !NextEntryToRead)
 	{
-		FTimerDelegate AttackDelegate;
-		AttackDelegate.BindUObject(this, &AMusicManager::PrepareForAttack);
-		GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0, false,  MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds);		
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds, false);
 	}
 }
 void AMusicManager::SendAttack(EAttackType MMAttackType)
