@@ -12,6 +12,7 @@ AProjectile::AProjectile()
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetupAttachment(this->RootComponent);
+	MeshComponent->SetCollisionProfileName("OverlapAll");
 
 }
 

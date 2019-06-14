@@ -13,7 +13,7 @@ ABeam::ABeam()
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetupAttachment(this->RootComponent);
-
+	MeshComponent->SetCollisionProfileName("OverlapAll");
 }
 
 // Called every frame
@@ -23,11 +23,11 @@ void ABeam::Tick(float DeltaTime)
 
 	if (!Started && Mesh && PlayerReference)
 	{
+		MeshComponent->SetStaticMesh(Mesh);
 		SetActorRotation(FRotator(UKismetMathLibrary::FindLookAtRotation(this->GetActorLocation(), PlayerReference->GetActorLocation())));
 		Started = true;
 	} else if(Started && !TimerSet)
 	{
-		MeshComponent->SetStaticMesh(Mesh);
 		FTimerHandle DeletionTimer; GetWorld()->GetTimerManager().SetTimer(DeletionTimer, this, &ABeam::DestroySelf, Duration, false);
 		TimerSet = true;
 	}

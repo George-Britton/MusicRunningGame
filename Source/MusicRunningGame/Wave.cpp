@@ -12,7 +12,7 @@ AWave::AWave()
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComponent->SetupAttachment(this->RootComponent);
-
+	MeshComponent->SetCollisionProfileName("OverlapAll");
 }
 
 // Called every frame
@@ -27,7 +27,7 @@ void AWave::Tick(float DeltaTime)
 	}else if(Started)
 	{
 		MeshComponent->SetWorldScale3D(FVector((MeshComponent->GetComponentScale().X), (MeshComponent->GetComponentScale().Y + 0.1), (MeshComponent->GetComponentScale().Z)));
-		AddActorWorldOffset(FVector(-Speed, 0, 0), true, nullptr, ETeleportType::None);
+		AddActorWorldOffset(FVector(Speed, 0, 0), true, nullptr, ETeleportType::None);
 	}
 
 }
