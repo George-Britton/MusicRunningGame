@@ -21,6 +21,13 @@ void AMusicManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Sets a timer for the oncoming bars
+	if (OncomingBarSpawnerReference && BPM)
+	{
+		OncomingBarSpawnFrequency = BPM / 60;
+		GetWorld()->GetTimerManager().SetTimer(OncomingBarTimer, this, &AMusicManager::SpawnBar, OncomingBarSpawnFrequency, true, OncomingBarSpawnFrequency);
+	}
+
 	if (MusicClips.Num() > 0)
 	{
 		// Plays the first music clip
@@ -70,4 +77,10 @@ void AMusicManager::PrepareForAttack()
 void AMusicManager::SendAttack(EAttackType MMAttackType)
 {
 	BossReference->Attack(MMAttackType);
+}
+
+// Called when an oncoming bar needs to be spawned
+void AMusicManager::SpawnBar()
+{
+	OncomingBarSpawnerReference->Spawn();
 }

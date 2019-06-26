@@ -16,24 +16,6 @@ AObstacleSpawner::AObstacleSpawner()
 
 }
 
-// Called when the game starts or when spawned
-void AObstacleSpawner::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if(ObstacleActor && ObstacleMeshes.Num() > 0)
-	{
-		// Creates a timer delegate and uses it in a timed spawn event
-		FTimerDelegate Delegate;
-		Delegate.BindUObject(this, &AObstacleSpawner::Spawn);
-		GetWorld()->GetTimerManager().SetTimer(SpawningTimer, Delegate, SpawnFrequencyInSeconds, true, 0);
-	} else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Please assign an obstacle class, and add at least one mesh to 'ObstacleMeshes'"));
-	}
-	
-}
-
 // Called every SpawnFrequencyInSeconds seconds
 void AObstacleSpawner::Spawn()
 {

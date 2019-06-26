@@ -63,14 +63,6 @@ public:
 		TArray<FBarData> BarDetails;
 		
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	// Called every time a value is changed
 	virtual void OnConstruction(const FTransform &trans) override;
 	

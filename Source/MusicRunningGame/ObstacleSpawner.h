@@ -40,11 +40,6 @@ public:
 		float Speed = 5;
 
 
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
 	// Called every SpawnFrequencyInSeconds seconds
 	UFUNCTION(Category = "Spawner")

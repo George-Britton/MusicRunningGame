@@ -24,31 +24,6 @@ void AOncomingBarSpawner::OnConstruction(const FTransform &trans)
 	if (SpawnPoint){SpawnPointComponent->SetStaticMesh(SpawnPoint);}
 }
 
-// Called when the game starts or when spawned
-void AOncomingBarSpawner::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if(BarActor && BarDetails.Num() > 0)
-	{
-		// Creates a timer delegate and uses it in a timed spawn event
-		FTimerDelegate Delegate;
-		Delegate.BindUObject(this, &AOncomingBarSpawner::Spawn);
-		GetWorld()->GetTimerManager().SetTimer(SpawningTimer, Delegate, SpawnFrequencyInSeconds, true, SpawnFrequencyInSeconds);
-	} else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Please assign a Bar class, and add at least one entry to 'Bar Details'"));
-	}
-
-}
-
-// Called every frame
-void AOncomingBarSpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
 // Called every SpawnFrequencyInSeconds seconds
 void AOncomingBarSpawner::Spawn()
 {

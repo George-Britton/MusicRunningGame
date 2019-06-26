@@ -4,7 +4,6 @@
 
 #include "Components/ActorComponent.h"
 #include "Engine.h"
-#include "SongData.h"
 #include "BossAttackData.generated.h"
 
 UENUM()
