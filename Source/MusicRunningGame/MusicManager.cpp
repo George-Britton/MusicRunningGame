@@ -26,6 +26,7 @@ void AMusicManager::BeginPlay()
 	{
 		OncomingBarSpawnFrequency = BPM / 60;
 		GetWorld()->GetTimerManager().SetTimer(OncomingBarTimer, this, &AMusicManager::SpawnBar, OncomingBarSpawnFrequency, true, OncomingBarSpawnFrequency);
+		OncomingBarSpawnerReference->SpawnFrequencyInSeconds = OncomingBarSpawnFrequency;
 	}
 
 	if (MusicClips.Num() > 0)
