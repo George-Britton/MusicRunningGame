@@ -31,8 +31,7 @@ AOncomingBarSpawner::AOncomingBarSpawner()
 // Called every time a value is changed
 void AOncomingBarSpawner::OnConstruction(const FTransform &trans)
 {
-	if (SpawnPoint){SpawnPointComponent->SetStaticMesh(SpawnPoint);}
-	
+	if (SpawnPoint){ SpawnPointComponent->SetStaticMesh(SpawnPoint); }
 }
 
 // Called when the game starts or when spawned
@@ -75,10 +74,55 @@ void AOncomingBarSpawner::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(SpawningTimer, SpawnDelegate, SpawnFrequencyInSeconds, true, 0);
 }
 
+// Called every frame
+void AOncomingBarSpawner::Tick(float DeltaTime)
+{
+	FTransform PrimaryTransform;
+	FTransform SecondaryTransform;
+	FTransform TertiaryTransform;
+	// Updates the location of the bar transforms, and marks the last of each as dirty to affect the changes
+	switch (BarDetails.Num())
+	{
+	case 3:	for (int32 TertiaryCounter = 0; TertiaryCounter < TertiaryStaticMeshComponent->GetInstanceCount() - 1; TertiaryCounter++)
+			{
+				TertiaryStaticMeshComponent->GetInstanceTransform(TertiaryCounter, TertiaryTransform, true);
+				TertiaryTransform.SetLocation(FVector((TertiaryTransform.GetLocation().X - Speed), (TertiaryTransform.GetLocation().Y), (TertiaryTransform.GetLocation().Z)));
+				TertiaryStaticMeshComponent->UpdateInstanceTransform(TertiaryCounter, TertiaryTransform, true ,false, true);
+			}
+			TertiaryStaticMeshComponent->GetInstanceTransform(TertiaryStaticMeshComponent->GetInstanceCount() - 1, TertiaryTransform, true);
+			TertiaryTransform.SetLocation(FVector((TertiaryTransform.GetLocation().X - Speed), (TertiaryTransform.GetLocation().Y), (TertiaryTransform.GetLocation().Z)));
+			TertiaryStaticMeshComponent->UpdateInstanceTransform(TertiaryStaticMeshComponent->GetInstanceCount() - 1, TertiaryTransform, true ,true, true);
+	case 2:	for (int32 SecondaryCounter = 0; SecondaryCounter < SecondaryStaticMeshComponent->GetInstanceCount() - 1; SecondaryCounter++)
+			{
+				SecondaryStaticMeshComponent->GetInstanceTransform(SecondaryCounter, SecondaryTransform, true);
+				SecondaryTransform.SetLocation(FVector((SecondaryTransform.GetLocation().X - Speed), (SecondaryTransform.GetLocation().Y), (SecondaryTransform.GetLocation().Z)));
+				SecondaryStaticMeshComponent->UpdateInstanceTransform(SecondaryCounter, SecondaryTransform, true ,false, true);
+			}
+			SecondaryStaticMeshComponent->GetInstanceTransform(SecondaryStaticMeshComponent->GetInstanceCount() - 1, SecondaryTransform, true);
+			SecondaryTransform.SetLocation(FVector((SecondaryTransform.GetLocation().X - Speed), (SecondaryTransform.GetLocation().Y), (SecondaryTransform.GetLocation().Z)));
+			SecondaryStaticMeshComponent->UpdateInstanceTransform(SecondaryStaticMeshComponent->GetInstanceCount() - 1, SecondaryTransform, true ,true, true);
+	case 1:	for (int32 PrimaryCounter = 0; PrimaryCounter < PrimaryStaticMeshComponent->GetInstanceCount() - 1; PrimaryCounter++)
+			{
+				PrimaryStaticMeshComponent->GetInstanceTransform(PrimaryCounter, PrimaryTransform, true);
+				PrimaryTransform.SetLocation(FVector((PrimaryTransform.GetLocation().X - Speed), (PrimaryTransform.GetLocation().Y), (PrimaryTransform.GetLocation().Z)));
+				PrimaryStaticMeshComponent->UpdateInstanceTransform(PrimaryCounter, PrimaryTransform, true ,false, true);
+			}
+			PrimaryStaticMeshComponent->GetInstanceTransform(PrimaryStaticMeshComponent->GetInstanceCount() - 1, PrimaryTransform, true);
+			PrimaryTransform.SetLocation(FVector((PrimaryTransform.GetLocation().X - Speed), (PrimaryTransform.GetLocation().Y), (PrimaryTransform.GetLocation().Z)));
+			PrimaryStaticMeshComponent->UpdateInstanceTransform(PrimaryStaticMeshComponent->GetInstanceCount() - 1, PrimaryTransform, true ,true, true);
+			break;
+	default: break;
+	}
+	
+	
+}
+
 // Called every SpawnFrequencyInSeconds seconds
 void AOncomingBarSpawner::Spawn()
 {
-	int8 BarChooser = FMath::RandRange(0, 2);
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Spawn"));
+
+	int8 BarChooser = FMath::RandRange(0, BarDetails.Num() - 1);
 	switch (BarChooser)
 	{
 	case 0:	PrimarySpawn(); break;
@@ -92,6 +136,8 @@ void AOncomingBarSpawner::Spawn()
 // Called when the corresponding bar type is chosen to be spawned
 void AOncomingBarSpawner::PrimarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Primary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	PrimaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
@@ -99,6 +145,8 @@ void AOncomingBarSpawner::PrimarySpawn()
 }
 void AOncomingBarSpawner::SecondarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Secondary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	SecondaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
@@ -106,6 +154,8 @@ void AOncomingBarSpawner::SecondarySpawn()
 }
 void AOncomingBarSpawner::TertiarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Tertiary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	TertiaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);

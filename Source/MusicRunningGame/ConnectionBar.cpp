@@ -41,13 +41,13 @@ void AConnectionBar::BeginPlay()
 // Called when the actor overlaps with anything
 void AConnectionBar::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (OtherActor->GetName() == OncomingBarSpawnerRef->GetName()){ IsOverlappingWithBar = true; }
+	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = true; }
 }
 
 // Called when the actor stops overlapping with anything
 void AConnectionBar::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	if (OtherActor->GetName() == OncomingBarSpawnerRef->GetName()){ IsOverlappingWithBar = false; }
+	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = false; }
 }
 
 // Called when the primary key is pressed
