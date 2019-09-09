@@ -35,8 +35,6 @@ public:
 		FKey SecondaryKey;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keys")
 		FKey TertiaryKey;
-	UPROPERTY(BlueprintReadWrite, Category = "Overlap")
-		bool IsOverlappingWithBar = false;
 
 	// Reference to the player character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
@@ -53,14 +51,6 @@ protected:
 public:	
 	// Called every time a value is changed
 	virtual void OnConstruction(const FTransform &trans) override;
-
-	// Called when the actor overlaps with anything
-	UFUNCTION()
-		void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
-	// Called when the actor stops overlapping with anything
-	UFUNCTION()
-		void NotifyActorEndOverlap(AActor* OtherActor) override;
 
 	// Input actions
 	UFUNCTION(BlueprintCallable, Category = "Input")

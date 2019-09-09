@@ -14,6 +14,8 @@ AConnectionBar::AConnectionBar()
 	this->ConnectionBarMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Connection Bar Component"));
 	ConnectionBarMeshComponent->SetupAttachment(this->RootComponent);
 
+	ConnectionBarMeshComponent->SetCollisionProfileName("OverlapAll");
+	ConnectionBarMeshComponent->bGenerateOverlapEvents = true;
 	/*
 	this->AutoReceiveInput = EAutoReceiveInput::Player0;
 	this->InputComponent->bBlockInput = false;
@@ -38,107 +40,104 @@ void AConnectionBar::BeginPlay()
 	*/
 }
 
-// Called when the actor overlaps with anything
-void AConnectionBar::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = true; }
-}
-
-// Called when the actor stops overlapping with anything
-void AConnectionBar::NotifyActorEndOverlap(AActor* OtherActor)
-{
-	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = false; }
-}
-
 // Called when the primary key is pressed
 void AConnectionBar::PrimaryKeyPress()
 {
-	bool bPrimaryOverlapping = false;
-	int32 OverlapIndex = 0;
-	float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
-	float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
-	float PrimaryBarHeight = OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
-	float PrimaryBarLocation;
-	FTransform CheckingTransform;
-
-	// Loops through the primary bars to find which one, if any, is overlapping
-	for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+	if(OncomingBarSpawnerRef->BarDetails.Num() >= 1)
 	{
-		OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
-		PrimaryBarLocation = CheckingTransform.GetLocation().X;
-		
-		if ((PrimaryBarLocation + (PrimaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
-		if ((PrimaryBarLocation - (PrimaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
+		bool bPrimaryOverlapping = false;
+		int32 OverlapIndex = 0;
+		float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
+		float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
+		float PrimaryBarHeight = OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
+		float PrimaryBarLocation;
+		FTransform CheckingTransform;
 
-		bPrimaryOverlapping = true;
-		OverlapIndex = InstanceFinder;
-		break;
-	}
+		// Loops through the primary bars to find which one, if any, is overlapping
+		for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+		{
+			OncomingBarSpawnerRef->PrimaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
+			PrimaryBarLocation = CheckingTransform.GetLocation().X;
+			
+			if ((PrimaryBarLocation + (PrimaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
+			if ((PrimaryBarLocation - (PrimaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
 
-	if (bPrimaryOverlapping)
-	{
-		OncomingBarSpawnerRef->PrimaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+			bPrimaryOverlapping = true;
+			OverlapIndex = InstanceFinder;
+			break;
+		}
+
+		if (bPrimaryOverlapping)
+		{
+			OncomingBarSpawnerRef->PrimaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+		}
 	}
 }
 
 // Called when the secondary key is pressed
 void AConnectionBar::SecondaryKeyPress()
 {
-	bool bSecondaryOverlapping = false;
-	int32 OverlapIndex = 0;
-	float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
-	float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
-	float SecondaryBarHeight = OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
-	float SecondaryBarLocation;
-	FTransform CheckingTransform;
-
-	// Loops through the primary bars to find which one, if any, is overlapping
-	for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+	if(OncomingBarSpawnerRef->BarDetails.Num() >= 2)
 	{
-		OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
-		SecondaryBarLocation = CheckingTransform.GetLocation().X;
-		
-		if ((SecondaryBarLocation + (SecondaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
-		if ((SecondaryBarLocation - (SecondaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
+		bool bSecondaryOverlapping = false;
+		int32 OverlapIndex = 0;
+		float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
+		float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
+		float SecondaryBarHeight = OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
+		float SecondaryBarLocation;
+		FTransform CheckingTransform;
 
-		bSecondaryOverlapping = true;
-		OverlapIndex = InstanceFinder;
-		break;
-	}
+		// Loops through the primary bars to find which one, if any, is overlapping
+		for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+		{
+			OncomingBarSpawnerRef->SecondaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
+			SecondaryBarLocation = CheckingTransform.GetLocation().X;
+			
+			if ((SecondaryBarLocation + (SecondaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
+			if ((SecondaryBarLocation - (SecondaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
 
-	if (bSecondaryOverlapping)
-	{
-		OncomingBarSpawnerRef->SecondaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+			bSecondaryOverlapping = true;
+			OverlapIndex = InstanceFinder;
+			break;
+		}
+
+		if (bSecondaryOverlapping)
+		{
+			OncomingBarSpawnerRef->SecondaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+		}
 	}
 }
 
 // Called when the tertiary key is pressed
 void AConnectionBar::TertiaryKeyPress()
 {
-	bool bTertiaryOverlapping = false;
-	int32 OverlapIndex = 0;
-	float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
-	float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
-	float TertiaryBarHeight = OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
-	float TertiaryBarLocation;
-	FTransform CheckingTransform;
-
-	// Loops through the primary bars to find which one, if any, is overlapping
-	for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+	if(OncomingBarSpawnerRef->BarDetails.Num() >= 3)
 	{
-		OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
-		TertiaryBarLocation = CheckingTransform.GetLocation().X;
-		
-		if ((TertiaryBarLocation + (TertiaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
-		if ((TertiaryBarLocation - (TertiaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
+		bool bTertiaryOverlapping = false;
+		int32 OverlapIndex = 0;
+		float ConnectionBarHeight = ConnectionBarMesh->GetBoundingBox().GetSize().X;
+		float ConnectionBarLocation = ConnectionBarMeshComponent->GetComponentLocation().X;
+		float TertiaryBarHeight = OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetStaticMesh()->GetBoundingBox().GetSize().X;
+		float TertiaryBarLocation;
+		FTransform CheckingTransform;
 
-		bTertiaryOverlapping = true;
-		OverlapIndex = InstanceFinder;
-		break;
-	}
+		// Loops through the primary bars to find which one, if any, is overlapping
+		for (int32 InstanceFinder = 0; InstanceFinder < OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetInstanceCount(); InstanceFinder++)
+		{
+			OncomingBarSpawnerRef->TertiaryStaticMeshComponent->GetInstanceTransform(InstanceFinder, CheckingTransform, true);
+			TertiaryBarLocation = CheckingTransform.GetLocation().X;
+			
+			if ((TertiaryBarLocation + (TertiaryBarHeight / 2) < (ConnectionBarLocation - (ConnectionBarHeight / 2)))){ continue; }
+			if ((TertiaryBarLocation - (TertiaryBarHeight / 2) > (ConnectionBarLocation + (ConnectionBarHeight / 2)))){ continue; }
 
-	if (bTertiaryOverlapping)
-	{
-		OncomingBarSpawnerRef->TertiaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+			bTertiaryOverlapping = true;
+			OverlapIndex = InstanceFinder;
+			break;
+		}
+
+		if (bTertiaryOverlapping)
+		{
+			OncomingBarSpawnerRef->TertiaryStaticMeshComponent->RemoveInstance(OverlapIndex);
+		}
 	}
 }
