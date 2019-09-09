@@ -35,6 +35,8 @@ public:
 		FKey SecondaryKey;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Keys")
 		FKey TertiaryKey;
+	UPROPERTY(BlueprintReadWrite, Category = "Overlap")
+		bool IsOverlappingWithBar = false;
 
 	// Reference to the player character
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")

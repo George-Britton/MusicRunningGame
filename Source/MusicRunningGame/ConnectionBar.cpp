@@ -14,8 +14,6 @@ AConnectionBar::AConnectionBar()
 	this->ConnectionBarMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Connection Bar Component"));
 	ConnectionBarMeshComponent->SetupAttachment(this->RootComponent);
 
-	ConnectionBarMeshComponent->SetCollisionProfileName("OverlapAll");
-	ConnectionBarMeshComponent->bGenerateOverlapEvents = true;
 	/*
 	this->AutoReceiveInput = EAutoReceiveInput::Player0;
 	this->InputComponent->bBlockInput = false;
@@ -38,6 +36,18 @@ void AConnectionBar::BeginPlay()
 	InputComponent->BindKey(SecondaryKey, IE_Pressed,this, &AConnectionBar::SecondaryKeyPress);
 	InputComponent->BindKey(TertiaryKey, IE_Pressed,this, &AConnectionBar::TertiaryKeyPress);
 	*/
+}
+
+// Called when the actor overlaps with anything
+void AConnectionBar::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = true; }
+}
+
+// Called when the actor stops overlapping with anything
+void AConnectionBar::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	if (OtherActor == OncomingBarSpawnerRef){ IsOverlappingWithBar = false; }
 }
 
 // Called when the primary key is pressed

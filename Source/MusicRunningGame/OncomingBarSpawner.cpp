@@ -23,13 +23,9 @@ AOncomingBarSpawner::AOncomingBarSpawner()
 	SpawnPointComponent->bHiddenInGame = true;
 	SpawnPointComponent->SetWorldScale3D(FVector(0.2,0.2,0.2));
 
-	// Sets collision of the bar ISMs
-	PrimaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
-	PrimaryStaticMeshComponent->bGenerateOverlapEvents = true;
-	SecondaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
-	SecondaryStaticMeshComponent->bGenerateOverlapEvents = true;
-	TertiaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
-	TertiaryStaticMeshComponent->bGenerateOverlapEvents = true;
+	// Initiates the array of spawned bars with a None index
+	BarTypeArray.Init(EBarType::None, 1);
+
 }
 
 // Called every time a value is changed
@@ -50,7 +46,6 @@ void AOncomingBarSpawner::BeginPlay()
 			BarDetails.Pop();
 		}else
 		{
-			ActiveSpawners = BarDetails.Num();
 			ArrayCleansed = true;
 		}
 	}
@@ -60,7 +55,7 @@ void AOncomingBarSpawner::BeginPlay()
 	{
 		ConnectionBarRef->OncomingBarSpawnerRef = this;
 
-		switch (ActiveSpawners)
+		switch (BarDetails.Num())
 		{
 		case 3: ConnectionBarRef->TertiaryKey = BarDetails[2].Key;
 				TertiaryStaticMeshComponent->SetStaticMesh(BarDetails[2].BarMesh);
@@ -68,13 +63,15 @@ void AOncomingBarSpawner::BeginPlay()
 				SecondaryStaticMeshComponent->SetStaticMesh(BarDetails[1].BarMesh);
 		case 1: ConnectionBarRef->PrimaryKey = BarDetails[0].Key;
 				PrimaryStaticMeshComponent->SetStaticMesh(BarDetails[0].BarMesh);
-				MeshesSet = true;
 				break;
 		default: break;
 		}
 	}
 
-	Super::BeginPlay();
+	// Creates a timer delegate and uses it in a timed spawn event
+	FTimerDelegate SpawnDelegate;
+	SpawnDelegate.BindUObject(this, &AOncomingBarSpawner::Spawn);
+	GetWorld()->GetTimerManager().SetTimer(SpawningTimer, SpawnDelegate, SpawnFrequencyInSeconds, true, 0);
 }
 
 // Called every frame
@@ -84,7 +81,7 @@ void AOncomingBarSpawner::Tick(float DeltaTime)
 	FTransform SecondaryTransform;
 	FTransform TertiaryTransform;
 	// Updates the location of the bar transforms, and marks the last of each as dirty to affect the changes
-	switch (ActiveSpawners)
+	switch (BarDetails.Num())
 	{
 	case 3:	for (int32 TertiaryCounter = 0; TertiaryCounter < TertiaryStaticMeshComponent->GetInstanceCount() - 1; TertiaryCounter++)
 			{
@@ -116,43 +113,51 @@ void AOncomingBarSpawner::Tick(float DeltaTime)
 			break;
 	default: break;
 	}
-	PrimaryStaticMeshComponent->GetIn
+	
+	
 }
 
 // Called every SpawnFrequencyInSeconds seconds
 void AOncomingBarSpawner::Spawn()
 {
-	if (MeshesSet)
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Spawn"));
+
+	int8 BarChooser = FMath::RandRange(0, BarDetails.Num() - 1);
+	switch (BarChooser)
 	{
-		int32 BarChooser = FMath::RandRange(0, BarDetails.Num() - 1);
-		switch (BarChooser)
-		{
-		case 0:	PrimarySpawn(); break;
-		case 1:	SecondarySpawn(); break;
-		case 2:	TertiarySpawn(); break;
-		default: break;
-		}
+	case 0:	PrimarySpawn(); break;
+	case 1:	SecondarySpawn(); break;
+	case 2:	TertiarySpawn(); break;
+	default: break;
 	}
+
 }
 
 // Called when the corresponding bar type is chosen to be spawned
 void AOncomingBarSpawner::PrimarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Primary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	PrimaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
+	BarTypeArray[BarTypeArray.Num() - 1] = EBarType::PrimaryBar;
 }
-
 void AOncomingBarSpawner::SecondarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Secondary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	SecondaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
+	BarTypeArray[BarTypeArray.Num() - 1] = EBarType::SecondaryBar;
 }
-
 void AOncomingBarSpawner::TertiarySpawn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::White, TEXT("Tertiary Spawn"));
+
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	TertiaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
+	BarTypeArray[BarTypeArray.Num() - 1] = EBarType::TertiaryBar;
 }

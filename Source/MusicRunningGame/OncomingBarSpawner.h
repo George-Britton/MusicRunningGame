@@ -60,6 +60,8 @@ public:
 	// How frequently the bars are spawned
 	UPROPERTY()
 		float SpawnFrequencyInSeconds = 0.6122;
+	UPROPERTY()
+		FTimerHandle SpawningTimer;
 
 	// Components that spawn the different bars
 	UPROPERTY()
@@ -68,8 +70,6 @@ public:
 		UInstancedStaticMeshComponent* SecondaryStaticMeshComponent;
 	UPROPERTY()
 		UInstancedStaticMeshComponent* TertiaryStaticMeshComponent;
-	UPROPERTY()
-		bool MeshesSet = false;
 
 	// Spawning point for the bars
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawner")
@@ -82,8 +82,10 @@ public:
 		float Speed = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bar Variables")
 		TArray<FBarData> BarDetails;
+
+	// Array saying which order the bars were spawned in
 	UPROPERTY()
-		int32 ActiveSpawners = 0;
+		TArray<EBarType> BarTypeArray;
 
 protected:
 	// Called when the game starts or when spawned
