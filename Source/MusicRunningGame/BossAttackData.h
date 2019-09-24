@@ -13,6 +13,7 @@ enum class EAttackType : uint8 {
 	WaveAttackType UMETA(DisplayName = "Wave"),
 	MeleeAttackType UMETA(DisplayName = "Melee"),
 	ConeAttackType UMETA(DisplayName = "Cone"),
+	SpecialAttackType UMETA(DisplayName = "Special"),
 	NoneAttackType UMETA(DisplayName = "None")
 };
 
