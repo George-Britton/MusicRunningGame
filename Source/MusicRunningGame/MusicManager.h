@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Engine/DataTable.h"
 #include "Boss.h"
 #include "BossAttackData.h"
 #include "OncomingBarSpawner.h"
@@ -15,18 +14,21 @@ class ABoss;
 class AOncomingBarSpawner;
 
 USTRUCT(BlueprintType)
-struct FAttackRosta
+struct FAttackData
 {
-    GENERATED_USTRUCT_BODY()
- 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EAttackType AttackType;
+	GENERATED_BODY()
 
-	FAttackRosta()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USoundCue* MusicClip;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FAttackTime> TimeStampsOfAttacks;
+
+	FAttackData()
 	{
-		AttackType = EAttackType::NoneAttackType;
+		MusicClip = nullptr;
+		TimeStampsOfAttacks.Empty();
 	}
- 
 };
 
 UCLASS()
@@ -44,21 +46,19 @@ public:
 	UPROPERTY()
 		float OncomingBarSpawnFrequency;
 
-	// Song and CSV of attack types
+	// Array of music clips and attack types
+	UPROPERTY(EditAnywhere, Category = "Music")
+		TArray<FAttackData> MusicClips;
 	UPROPERTY()
 		UAudioComponent* MusicPlayer;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-		USoundCue* Song;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attacks")
-		UDataTable* AttackRosta;
 	UPROPERTY()
-		FDataTableRowHandle AttackType;
-
-	// Timer for attacks
+		int32 ClipToPlay;
+	UPROPERTY()
+		FTimerHandle MusicTimer;
 	UPROPERTY()
 		FTimerHandle AttackTimer;
 	UPROPERTY()
-		int32 EntryToRead = 1;
+		int32 NextEntryToRead = 0;
 
 	// Reference to the oncoming bar spawner
 	UPROPERTY(EditAnywhere, Category = "Oncoming Bar Spawner")
@@ -71,15 +71,15 @@ public:
 		ABoss* BossReference;
 
 	// How long the boss needs to telegraph each attack type
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float ProjectileTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float BeamTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float WaveTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float MeleeTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float ConeTelegraphTime = 0;
 
 protected:
@@ -87,12 +87,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every time a value is changed
-	virtual void OnConstruction(const FTransform &trans) override;
+
+	// Called when the music clip cycles
+	UFUNCTION()
+		void PlayNextClip();
 
 	// Called when the boss needs to attack
 	UFUNCTION()
-		void PrepareForAttack(EAttackType MMAttackType);
+		void PrepareForAttack();
 	UFUNCTION()
 		void SendAttack(EAttackType MMAttackType);
 

@@ -107,8 +107,4 @@ public:
 		void SecondarySpawn();
 	UFUNCTION(Category = "Spawner")
 		void TertiarySpawn();
-
-	// Called when moving the ISMs
-	UFUNCTION(Category = "Movement")
-		void MoveISMs(UInstancedStaticMeshComponent* MoveComponent);
 };

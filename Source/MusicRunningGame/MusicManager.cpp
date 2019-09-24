@@ -3,7 +3,6 @@
 #pragma once
 
 #include "MusicManager.h"
-#include "GameplayTagsManager.h"
 
 
 // Sets default values
@@ -13,21 +12,8 @@ AMusicManager::AMusicManager()
 	PrimaryActorTick.bCanEverTick = true;
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	this->MusicPlayer = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
-	this->AttackRosta = CreateDefaultSubobject<UDataTable>(TEXT("Attack Rosta"));
 	MusicPlayer->SetupAttachment(this->RootComponent);
 
-}
-
-// Called every time a value is changed
-void AMusicManager::OnConstruction(const FTransform &trans)
-{
-	/*
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT(""));
-
-	FString RowHolder;
-	AttackRosta->FindRow<FAttackRosta>(FName("1"), RowHolder, true);
-	GLog->Log(RowHolder);
-	*/
 }
 
 // Called when the game starts or when spawned
@@ -38,18 +24,56 @@ void AMusicManager::BeginPlay()
 	// Sets a timer for the oncoming bars
 	if (OncomingBarSpawnerReference && BPM)
 	{
-		OncomingBarSpawnFrequency = 60 / BPM;
+		OncomingBarSpawnFrequency = BPM / 60;
 		GetWorld()->GetTimerManager().SetTimer(OncomingBarTimer, this, &AMusicManager::SpawnBar, OncomingBarSpawnFrequency, true, OncomingBarSpawnFrequency);
 		OncomingBarSpawnerReference->SpawnFrequencyInSeconds = OncomingBarSpawnFrequency;
 	}
 
-	
+	if (MusicClips.Num() > 0)
+	{
+		// Plays the first music clip
+		ClipToPlay = FMath::RandRange(0, MusicClips.Num()-1);
+		MusicPlayer->SetSound(MusicClips[ClipToPlay].MusicClip);
+		MusicPlayer->Play();
+
+		// Sets a timer for the next clip
+		GetWorld()->GetTimerManager().SetTimer(MusicTimer, this, &AMusicManager::PlayNextClip, MusicClips[ClipToPlay].MusicClip->GetDuration(), false);
+
+		// Sets a timer for the first attack
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds, false);
+	}
+}
+
+ // Called when the music clip cycles
+void AMusicManager::PlayNextClip()
+{
+	// Plays the next clip and sets the attack counter to 0
+	NextEntryToRead = 0;
+	ClipToPlay = FMath::RandRange(0, MusicClips.Num()-1);
+	MusicPlayer->SetSound(MusicClips[ClipToPlay].MusicClip);
+
+	// Sets a timer for the next clip
+	GetWorld()->GetTimerManager().SetTimer(MusicTimer, this, &AMusicManager::PlayNextClip, MusicClips[ClipToPlay].MusicClip->GetDuration(), false);
+
+	// Sets a timer for the next attack
+	GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds, false);
+
 }
 
 // Called when the boss needs to be told to attack
-void AMusicManager::PrepareForAttack(EAttackType MMAttackType)
+void AMusicManager::PrepareForAttack()
 {
-	EntryToRead++;
+	SendAttack(MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].AttackType);
+
+	// Sets a timer for the next attack
+	float Delay;
+	if (NextEntryToRead + 1 < MusicClips[ClipToPlay].TimeStampsOfAttacks.Num())
+	{
+		Delay = MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead + 1].TimeStampInSeconds - MusicClips[ClipToPlay].TimeStampsOfAttacks[NextEntryToRead].TimeStampInSeconds;
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &AMusicManager::PrepareForAttack, Delay, false);
+	}
+
+	NextEntryToRead++;
 }
 void AMusicManager::SendAttack(EAttackType MMAttackType)
 {

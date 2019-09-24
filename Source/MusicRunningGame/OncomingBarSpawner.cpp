@@ -25,8 +25,11 @@ AOncomingBarSpawner::AOncomingBarSpawner()
 
 	// Sets collision of the bar ISMs
 	PrimaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
+	PrimaryStaticMeshComponent->bGenerateOverlapEvents = true;
 	SecondaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
+	SecondaryStaticMeshComponent->bGenerateOverlapEvents = true;
 	TertiaryStaticMeshComponent->SetCollisionProfileName("OverlapAll");
+	TertiaryStaticMeshComponent->bGenerateOverlapEvents = true;
 }
 
 // Called every time a value is changed
@@ -83,9 +86,33 @@ void AOncomingBarSpawner::Tick(float DeltaTime)
 	// Updates the location of the bar transforms, and marks the last of each as dirty to affect the changes
 	switch (ActiveSpawners)
 	{
-	case 3:	MoveISMs(TertiaryStaticMeshComponent);
-	case 2:	MoveISMs(SecondaryStaticMeshComponent);
-	case 1:	MoveISMs(PrimaryStaticMeshComponent);
+	case 3:	for (int32 TertiaryCounter = 0; TertiaryCounter < TertiaryStaticMeshComponent->GetInstanceCount() - 1; TertiaryCounter++)
+			{
+				TertiaryStaticMeshComponent->GetInstanceTransform(TertiaryCounter, TertiaryTransform, true);
+				TertiaryTransform.SetLocation(FVector((TertiaryTransform.GetLocation().X - Speed), (TertiaryTransform.GetLocation().Y), (TertiaryTransform.GetLocation().Z)));
+				TertiaryStaticMeshComponent->UpdateInstanceTransform(TertiaryCounter, TertiaryTransform, true ,false, true);
+			}
+			TertiaryStaticMeshComponent->GetInstanceTransform(TertiaryStaticMeshComponent->GetInstanceCount() - 1, TertiaryTransform, true);
+			TertiaryTransform.SetLocation(FVector((TertiaryTransform.GetLocation().X - Speed), (TertiaryTransform.GetLocation().Y), (TertiaryTransform.GetLocation().Z)));
+			TertiaryStaticMeshComponent->UpdateInstanceTransform(TertiaryStaticMeshComponent->GetInstanceCount() - 1, TertiaryTransform, true ,true, true);
+	case 2:	for (int32 SecondaryCounter = 0; SecondaryCounter < SecondaryStaticMeshComponent->GetInstanceCount() - 1; SecondaryCounter++)
+			{
+				SecondaryStaticMeshComponent->GetInstanceTransform(SecondaryCounter, SecondaryTransform, true);
+				SecondaryTransform.SetLocation(FVector((SecondaryTransform.GetLocation().X - Speed), (SecondaryTransform.GetLocation().Y), (SecondaryTransform.GetLocation().Z)));
+				SecondaryStaticMeshComponent->UpdateInstanceTransform(SecondaryCounter, SecondaryTransform, true ,false, true);
+			}
+			SecondaryStaticMeshComponent->GetInstanceTransform(SecondaryStaticMeshComponent->GetInstanceCount() - 1, SecondaryTransform, true);
+			SecondaryTransform.SetLocation(FVector((SecondaryTransform.GetLocation().X - Speed), (SecondaryTransform.GetLocation().Y), (SecondaryTransform.GetLocation().Z)));
+			SecondaryStaticMeshComponent->UpdateInstanceTransform(SecondaryStaticMeshComponent->GetInstanceCount() - 1, SecondaryTransform, true ,true, true);
+	case 1:	for (int32 PrimaryCounter = 0; PrimaryCounter < PrimaryStaticMeshComponent->GetInstanceCount() - 1; PrimaryCounter++)
+			{
+				PrimaryStaticMeshComponent->GetInstanceTransform(PrimaryCounter, PrimaryTransform, true);
+				PrimaryTransform.SetLocation(FVector((PrimaryTransform.GetLocation().X - Speed), (PrimaryTransform.GetLocation().Y), (PrimaryTransform.GetLocation().Z)));
+				PrimaryStaticMeshComponent->UpdateInstanceTransform(PrimaryCounter, PrimaryTransform, true ,false, true);
+			}
+			PrimaryStaticMeshComponent->GetInstanceTransform(PrimaryStaticMeshComponent->GetInstanceCount() - 1, PrimaryTransform, true);
+			PrimaryTransform.SetLocation(FVector((PrimaryTransform.GetLocation().X - Speed), (PrimaryTransform.GetLocation().Y), (PrimaryTransform.GetLocation().Z)));
+			PrimaryStaticMeshComponent->UpdateInstanceTransform(PrimaryStaticMeshComponent->GetInstanceCount() - 1, PrimaryTransform, true ,true, true);
 			break;
 	default: break;
 	}
@@ -127,19 +154,4 @@ void AOncomingBarSpawner::TertiarySpawn()
 	FTransform SpawnParams;
 	SpawnParams.SetLocation(SpawnPointComponent->GetComponentLocation());
 	TertiaryStaticMeshComponent->AddInstanceWorldSpace(SpawnParams);
-}
-
-// Called when moving the ISMs
-void AOncomingBarSpawner::MoveISMs(UInstancedStaticMeshComponent* MoveComponent)
-{
-	FTransform TransformHolder;
-	for (int32 InstanceCounter = 0; InstanceCounter < MoveComponent->GetInstanceCount() - 1; InstanceCounter++)
-	{
-		MoveComponent->GetInstanceTransform(InstanceCounter, TransformHolder, true);
-		TransformHolder.SetLocation(FVector((TransformHolder.GetLocation().X - Speed), (TransformHolder.GetLocation().Y), (TransformHolder.GetLocation().Z)));
-		MoveComponent->UpdateInstanceTransform(InstanceCounter, TransformHolder, true ,false, true);
-	}
-	MoveComponent->GetInstanceTransform(MoveComponent->GetInstanceCount() - 1, TransformHolder, true);
-	TransformHolder.SetLocation(FVector((TransformHolder.GetLocation().X - Speed), (TransformHolder.GetLocation().Y), (TransformHolder.GetLocation().Z)));
-	MoveComponent->UpdateInstanceTransform(MoveComponent->GetInstanceCount() - 1, TransformHolder, true ,true, true);
 }
