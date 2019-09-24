@@ -46,9 +46,9 @@ void AMusicManager::BeginPlay()
 		}
 	}
 
-	EAttackType FirstAttackType = AttackRostaArray[0]->AttackType;
+	EAttackType FirstAttackType = AttackRostaArray[0].AttackType;
 	float FirstTelegraphTime = 0.f;
-	switch(AttackRostaArray[0]->AttackType)
+	switch(AttackRostaArray[0].AttackType)
 	{
 	case EAttackType::ProjectileAttackType: FirstTelegraphTime = ProjectileTelegraphTime; break;
 	case EAttackType::BeamAttackType: FirstTelegraphTime = BeamTelegraphTime; break;
