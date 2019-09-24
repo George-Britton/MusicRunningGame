@@ -46,7 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		float ProjectileSpeed = 3;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ProjectileTelegraphTime = 0;
+		float ProjectileTelegraphTime = 0.1;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		UClass* BeamActor;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
@@ -56,7 +56,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		float BeamDuration = 3;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float BeamTelegraphTime = 0;
+		float BeamTelegraphTime = 0.1;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		UClass* WaveActor;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
@@ -66,7 +66,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		float WaveSpeed = 3;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float WaveTelegraphTime = 0;
+		float WaveTelegraphTime = 0.1;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		UClass* MeleeActor;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
@@ -74,7 +74,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		float MeleeDamage = 5;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float MeleeTelegraphTime = 0;
+		float MeleeTelegraphTime = 0.1;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		UClass* ConeActor;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
@@ -82,7 +82,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Attacks")
 		float ConeDamage = 5;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ConeTelegraphTime = 0;
+		float ConeTelegraphTime = 0.1;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		UClass* SpecialActor;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		UStaticMesh* SpecialMesh;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float SpecialDamage = 5;
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		float SpecialTelegraphTime = 0.1;
 
 protected:
 	// Called when the game starts or when spawned
@@ -99,9 +107,15 @@ public:
 	UFUNCTION()
 		void Attack(EAttackType AttackType);
 	UFUNCTION()
+		void TelegraphProjectile(float WaitTime);
+	UFUNCTION()
 		void SpawnProjectile();
 	UFUNCTION()
+		void TelegraphBeam(float WaitTime);
+	UFUNCTION()
 		void SpawnBeam();
+	UFUNCTION()
+		void TelegraphWave(float WaitTime);
 	UFUNCTION()
 		void SpawnWave();
 	

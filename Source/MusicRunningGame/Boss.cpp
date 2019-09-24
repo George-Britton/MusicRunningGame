@@ -36,6 +36,7 @@ void ABoss::BeginPlay()
 		MusicManagerReference->WaveTelegraphTime = WaveTelegraphTime;
 		MusicManagerReference->MeleeTelegraphTime = MeleeTelegraphTime;
 		MusicManagerReference->ConeTelegraphTime = ConeTelegraphTime;
+		MusicManagerReference->SpecialTelegraphTime = SpecialTelegraphTime;
 		MusicManagerReference->BossReference = this;
 	}
 
@@ -60,6 +61,12 @@ void ABoss::Attack(EAttackType BossAttackType)
 	case EAttackType::WaveAttackType : SpawnWave(); break;
 	}
 }
+void ABoss::TelegraphProjectile(float WaitTime)
+{
+	FTimerHandle ProjectileTimer;
+	FTimerDelegate ProjectileDelegate;
+	GetWorld()->GetTimerManager().SetTimer(ProjectileTimer, ProjectileDelegate, WaitTime ,false);
+}
 void ABoss::SpawnProjectile()
 {
 	const FVector SpawnLoc = GetActorLocation();
@@ -73,6 +80,12 @@ void ABoss::SpawnProjectile()
 	ProjectileRef->Speed = ProjectileSpeed;
 	ProjectileRef->PlayerReference = PlayerReference;
 }
+void ABoss::TelegraphBeam(float WaitTime)
+{
+	FTimerHandle BeamTimer;
+	FTimerDelegate BeamDelegate;
+	GetWorld()->GetTimerManager().SetTimer(BeamTimer, BeamDelegate, WaitTime ,false);
+}
 void ABoss::SpawnBeam()
 {
 	const FVector SpawnLoc = GetActorLocation();
@@ -85,6 +98,12 @@ void ABoss::SpawnBeam()
 	BeamRef->Damage = BeamDamage;
 	BeamRef->Duration = BeamDuration;
 	BeamRef->PlayerReference = PlayerReference;
+}
+void ABoss::TelegraphWave(float WaitTime)
+{
+	FTimerHandle WaveTimer;
+	FTimerDelegate WaveDelegate;
+	GetWorld()->GetTimerManager().SetTimer(WaveTimer, WaveDelegate, WaitTime ,false);
 }
 void ABoss::SpawnWave()
 {

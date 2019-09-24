@@ -51,14 +51,12 @@ public:
 		USoundCue* Song;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attacks")
 		UDataTable* AttackRosta;
-	UPROPERTY()
-		FDataTableRowHandle AttackType;
 
 	// Timer for attacks
 	UPROPERTY()
 		FTimerHandle AttackTimer;
 	UPROPERTY()
-		int32 EntryToRead = 1;
+		int32 EntryToRead = 0;
 
 	// Reference to the oncoming bar spawner
 	UPROPERTY(EditAnywhere, Category = "Oncoming Bar Spawner")
@@ -71,30 +69,31 @@ public:
 		ABoss* BossReference;
 
 	// How long the boss needs to telegraph each attack type
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float ProjectileTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float BeamTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float WaveTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float MeleeTelegraphTime = 0;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY()
 		float ConeTelegraphTime = 0;
+	UPROPERTY()
+		float SpecialTelegraphTime = 0;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every time a value is changed
-	virtual void OnConstruction(const FTransform &trans) override;
+	// Called when the boss needs to telegraph
+	UFUNCTION()
+		void PrepareForAttack(EAttackType MMAttackType, TArray<FAttackRosta> Rosta);
 
-	// Called when the boss needs to attack
+	// Called when the Music Manager needs to cue the next telegraph
 	UFUNCTION()
-		void PrepareForAttack(EAttackType MMAttackType);
-	UFUNCTION()
-		void SendAttack(EAttackType MMAttackType);
+		void SetupNextAttack(TArray<FAttackRosta> Rosta);
 
 	// Called when an oncoming bar needs to be spawned
 	UFUNCTION()
