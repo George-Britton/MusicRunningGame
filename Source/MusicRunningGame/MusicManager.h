@@ -14,6 +14,7 @@
 class ABoss;
 class AOncomingBarSpawner;
 
+// Struct that holds the upcoming attack information
 USTRUCT(BlueprintType)
 struct FAttackRosta
 {
@@ -26,7 +27,7 @@ struct FAttackRosta
 	{
 		AttackType = EAttackType::NoneAttackType;
 	}
- 
+
 };
 
 UCLASS()
@@ -51,6 +52,7 @@ public:
 		USoundCue* Song;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attacks")
 		UDataTable* AttackRosta;
+		TArray<FAttackRosta*> AttackRostaArray;
 
 	// Timer for attacks
 	UPROPERTY()

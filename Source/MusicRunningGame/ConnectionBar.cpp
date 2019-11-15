@@ -15,7 +15,7 @@ AConnectionBar::AConnectionBar()
 	ConnectionBarMeshComponent->SetupAttachment(this->RootComponent);
 
 	ConnectionBarMeshComponent->SetCollisionProfileName("OverlapAll");
-	ConnectionBarMeshComponent->bGenerateOverlapEvents = true;
+	//ConnectionBarMeshComponent->bGenerateOverlapEvents = true;
 	/*
 	this->AutoReceiveInput = EAutoReceiveInput::Player0;
 	this->InputComponent->bBlockInput = false;

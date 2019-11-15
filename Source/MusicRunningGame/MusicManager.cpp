@@ -32,38 +32,41 @@ void AMusicManager::BeginPlay()
 		OncomingBarSpawnerReference->SpawnFrequencyInSeconds = OncomingBarSpawnFrequency;
 	}
 
-	TArray<FAttackRosta*> AttackRostaArray;
-	//not null. we loaded something in. 
-	if (this->AttackRosta) {
+	// Check rosta is loaded in
+	if (AttackRosta) {
 
+		// Gets the row numbers of rosta
 		TArray<FName> RowNumbers = AttackRosta->GetRowNames(); // row numbers
 		FString ContextString;
 
+		// Tries to pull AttackType from rosta and put into AttackRosta
 		for (FName& Row : RowNumbers)
 		{
 			FAttackRosta* AttackType = AttackRosta->FindRow<FAttackRosta>(Row, ContextString);
 			if(AttackType){ AttackRostaArray.Add(AttackType); }
 		}
+
+		// Finds first attack type to telegraph
+		EAttackType FirstAttackType = AttackRostaArray[0]->AttackType;
+		float FirstTelegraphTime = 0.f;
+		switch (AttackRostaArray[0]->AttackType)
+		{
+		case EAttackType::ProjectileAttackType: FirstTelegraphTime = ProjectileTelegraphTime; break;
+		case EAttackType::BeamAttackType: FirstTelegraphTime = BeamTelegraphTime; break;
+		case EAttackType::WaveAttackType: FirstTelegraphTime = WaveTelegraphTime; break;
+		case EAttackType::ConeAttackType: FirstTelegraphTime = ConeTelegraphTime; break;
+		case EAttackType::MeleeAttackType: FirstTelegraphTime = MeleeTelegraphTime; break;
+		case EAttackType::SpecialAttackType: FirstTelegraphTime = SpecialTelegraphTime; break;
+		default: break;
+		}
+
+		FTimerHandle StartAttackingTimer;
+		FTimerDelegate StartAttackingDelegate;
+		StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType, AttackRostaArray);
+		GetWorld()->GetTimerManager().SetTimer(StartAttackingTimer, StartAttackingDelegate, FirstTelegraphTime, false);
 	}
 
-	EAttackType FirstAttackType = AttackRostaArray[0]->AttackType;
-	float FirstTelegraphTime = 0.f;
-	switch(AttackRostaArray[0]->AttackType)
-	{
-	case EAttackType::ProjectileAttackType: FirstTelegraphTime = ProjectileTelegraphTime; break;
-	case EAttackType::BeamAttackType: FirstTelegraphTime = BeamTelegraphTime; break;
-	case EAttackType::WaveAttackType: FirstTelegraphTime = WaveTelegraphTime; break;
-	case EAttackType::ConeAttackType: FirstTelegraphTime = ConeTelegraphTime; break;
-	case EAttackType::MeleeAttackType: FirstTelegraphTime = MeleeTelegraphTime; break;
-	case EAttackType::SpecialAttackType: FirstTelegraphTime = SpecialTelegraphTime; break;
-	default: break;
-	}
 
-	FTimerHandle StartAttackingTimer;
-	FTimerDelegate StartAttackingDelegate;
-	StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType, AttackRostaArray);
-	GetWorld()->GetTimerManager().SetTimer(StartAttackingTimer, StartAttackingDelegate, FirstTelegraphTime, false);
-	
 }
 
 // Called when the boss needs to be told to attack

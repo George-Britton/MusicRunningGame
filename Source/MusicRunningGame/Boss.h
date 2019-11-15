@@ -13,6 +13,40 @@
 
 class AMusicManager;
 
+// Struct with the boss' attack details
+USTRUCT(BlueprintType)
+struct FAttackDetails
+{
+	GENERATED_BODY()
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		UClass* AttackActor;
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		UStaticMesh* AttackMesh;
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		float AttackDamage;
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		float AttackSpeed;
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		float AttackTelegraphTime;
+
+		UPROPERTY(EditAnywhere, BlueprintreadWrite)
+		float AttackDuration;
+
+		FAttackDetails() {
+			AttackActor = nullptr;
+			AttackMesh = nullptr;
+			AttackDamage = 2;
+			AttackSpeed = 3;
+			AttackTelegraphTime = 0.1;
+			AttackDuration = 1;
+		}
+};
+
 UCLASS()
 class MUSICRUNNINGGAME_API ABoss : public AActor
 {
@@ -36,61 +70,25 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player")
 		AMusicManager* MusicManagerReference;
 
+	// Static mesh for the target
+	UPROPERTY(EditAnywhere, Category = "Attacks")
+		UClass* TargetClass;
+	UPROPERTY()
+		AActor* TargetRef;
+
 	// The boss' attack variables
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* ProjectileActor;
+		FAttackDetails ProjectileAttack;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* ProjectileMesh;
+		FAttackDetails BeamAttack;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ProjectileDamage = 2;
+		FAttackDetails WaveAttack;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ProjectileSpeed = 3;
+		FAttackDetails MeleeAttack;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ProjectileTelegraphTime = 0.1;
+		FAttackDetails ConeAttack;
 	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* BeamActor;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* BeamMesh;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float BeamDamage = 4;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float BeamDuration = 3;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float BeamTelegraphTime = 0.1;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* WaveActor;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* WaveMesh;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float WaveDamage = 5;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float WaveSpeed = 3;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float WaveTelegraphTime = 0.1;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* MeleeActor;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* MeleeMesh;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float MeleeDamage = 5;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float MeleeTelegraphTime = 0.1;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* ConeActor;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* ConeMesh;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ConeDamage = 5;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float ConeTelegraphTime = 0.1;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UClass* SpecialActor;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		UStaticMesh* SpecialMesh;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float SpecialDamage = 5;
-	UPROPERTY(EditAnywhere, Category = "Attacks")
-		float SpecialTelegraphTime = 0.1;
+		FAttackDetails SpecialAttack;
 
 protected:
 	// Called when the game starts or when spawned

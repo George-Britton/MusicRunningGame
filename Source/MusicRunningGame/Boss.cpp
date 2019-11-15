@@ -31,12 +31,12 @@ void ABoss::BeginPlay()
 
 	if(MusicManagerReference)
 	{
-		MusicManagerReference->ProjectileTelegraphTime = ProjectileTelegraphTime;
-		MusicManagerReference->BeamTelegraphTime = BeamTelegraphTime;
-		MusicManagerReference->WaveTelegraphTime = WaveTelegraphTime;
-		MusicManagerReference->MeleeTelegraphTime = MeleeTelegraphTime;
-		MusicManagerReference->ConeTelegraphTime = ConeTelegraphTime;
-		MusicManagerReference->SpecialTelegraphTime = SpecialTelegraphTime;
+		MusicManagerReference->ProjectileTelegraphTime = ProjectileAttack.AttackTelegraphTime;
+		MusicManagerReference->BeamTelegraphTime = BeamAttack.AttackTelegraphTime;
+		MusicManagerReference->WaveTelegraphTime = WaveAttack.AttackTelegraphTime;
+		MusicManagerReference->MeleeTelegraphTime = MeleeAttack.AttackTelegraphTime;
+		MusicManagerReference->ConeTelegraphTime = ConeAttack.AttackTelegraphTime;
+		MusicManagerReference->SpecialTelegraphTime = SpecialAttack.AttackTelegraphTime;
 		MusicManagerReference->BossReference = this;
 	}
 
@@ -74,14 +74,19 @@ void ABoss::SpawnProjectile()
 	FActorSpawnParameters SpawnParams;
 
 	// Gets a reference to the new projectile and gives it the preset variables
-	AProjectile* ProjectileRef = GetWorld()->SpawnActor<AProjectile>(ProjectileActor, SpawnLoc, SpawnRot, SpawnParams);
-	ProjectileRef->Mesh = ProjectileMesh;
-	ProjectileRef->Damage = ProjectileDamage;
-	ProjectileRef->Speed = ProjectileSpeed;
+	AProjectile* ProjectileRef = GetWorld()->SpawnActor<AProjectile>(ProjectileAttack.AttackActor, SpawnLoc, SpawnRot, SpawnParams);
+	ProjectileRef->Mesh = ProjectileAttack.AttackMesh;
+	ProjectileRef->Damage = ProjectileAttack.AttackDamage;
+	ProjectileRef->Speed = ProjectileAttack.AttackSpeed;
 	ProjectileRef->PlayerReference = PlayerReference;
 }
 void ABoss::TelegraphBeam(float WaitTime)
 {
+	const FVector SpawnLoc = PlayerReference->GetActorLocation();
+	const FRotator SpawnRot(FQuat::Identity);
+	FActorSpawnParameters SpawnParams;
+
+	TargetRef = GetWorld()->SpawnActor<AProjectile>(TargetClass, SpawnLoc, SpawnRot, SpawnParams);
 	FTimerHandle BeamTimer;
 	FTimerDelegate BeamDelegate;
 	GetWorld()->GetTimerManager().SetTimer(BeamTimer, BeamDelegate, WaitTime ,false);
@@ -93,10 +98,11 @@ void ABoss::SpawnBeam()
 	FActorSpawnParameters SpawnParams;
 
 	// Gets a reference to the new projectile and gives it the preset variables
-	ABeam* BeamRef = GetWorld()->SpawnActor<ABeam>(BeamActor, SpawnLoc, SpawnRot, SpawnParams);
-	BeamRef->Mesh = BeamMesh;
-	BeamRef->Damage = BeamDamage;
-	BeamRef->Duration = BeamDuration;
+	ABeam* BeamRef = GetWorld()->SpawnActor<ABeam>(BeamAttack.AttackActor, SpawnLoc, SpawnRot, SpawnParams);
+	TargetRef->Destroy();
+	BeamRef->Mesh = BeamAttack.AttackMesh;
+	BeamRef->Damage = BeamAttack.AttackDamage;
+	BeamRef->Duration = BeamAttack.AttackDuration;
 	BeamRef->PlayerReference = PlayerReference;
 }
 void ABoss::TelegraphWave(float WaitTime)
@@ -112,9 +118,9 @@ void ABoss::SpawnWave()
 	FActorSpawnParameters SpawnParams;
 
 	// Gets a reference to the new projectile and gives it the preset variables
-	AWave* WaveRef = GetWorld()->SpawnActor<AWave>(WaveActor, SpawnLoc, SpawnRot, SpawnParams);
-	WaveRef->Mesh = WaveMesh;
-	WaveRef->Damage = WaveDamage;
-	WaveRef->Speed = WaveSpeed;
+	AWave* WaveRef = GetWorld()->SpawnActor<AWave>(WaveAttack.AttackActor, SpawnLoc, SpawnRot, SpawnParams);
+	WaveRef->Mesh = WaveAttack.AttackMesh;
+	WaveRef->Damage = WaveAttack.AttackDamage;
+	WaveRef->Speed = WaveAttack.AttackSpeed;
 	WaveRef->PlayerReference = PlayerReference;
 }
