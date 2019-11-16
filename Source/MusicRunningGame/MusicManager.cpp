@@ -12,8 +12,8 @@ AMusicManager::AMusicManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	this->RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	this->MusicPlayer = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
-	this->AttackRosta = CreateDefaultSubobject<UDataTable>(TEXT("Attack Rosta"));
+	this->MusicPlayer = CreateDefaultSubobject<UAudioComponent>(TEXT("Music Player"));
+	this->AttackRoster = CreateDefaultSubobject<UDataTable>(TEXT("Attack Roster"));
 	MusicPlayer->SetupAttachment(this->RootComponent);
 
 }
@@ -32,24 +32,26 @@ void AMusicManager::BeginPlay()
 		OncomingBarSpawnerReference->SpawnFrequencyInSeconds = OncomingBarSpawnFrequency;
 	}
 
-	// Check rosta is loaded in
-	if (AttackRosta) {
+	// Check Roster is loaded in
+	if (AttackRoster) {
 
-		// Gets the row numbers of rosta
-		TArray<FName> RowNumbers = AttackRosta->GetRowNames(); // row numbers
-		FString ContextString;
-
-		// Tries to pull AttackType from rosta and put into AttackRosta
-		for (FName& Row : RowNumbers)
+		// Gets the row numbers of Roster
+		TArray<TArray<FString>> AttackStringArray = AttackRoster->GetTableData();
+		
+		for (int32 RosterFiller = 1; RosterFiller < AttackStringArray.Num(); RosterFiller++)
 		{
-			FAttackRosta* AttackType = AttackRosta->FindRow<FAttackRosta>(Row, ContextString);
-			if(AttackType){ AttackRostaArray.Add(AttackType); }
+			if (AttackStringArray[RosterFiller][1] == FString("ProjectileAttackType")) AttackRosterArray.Add(EAttackType::ProjectileAttackType);
+			else if (AttackStringArray[RosterFiller][1] == FString("BeamAttackType")) AttackRosterArray.Add(EAttackType::BeamAttackType);
+			else if (AttackStringArray[RosterFiller][1] == FString("WaveAttackType")) AttackRosterArray.Add(EAttackType::WaveAttackType);
+			else if (AttackStringArray[RosterFiller][1] == FString("ConeAttackType")) AttackRosterArray.Add(EAttackType::ConeAttackType);
+			else if (AttackStringArray[RosterFiller][1] == FString("MeleeAttackType")) AttackRosterArray.Add(EAttackType::MeleeAttackType);
+			else if (AttackStringArray[RosterFiller][1] == FString("SpecialAttackType")) AttackRosterArray.Add(EAttackType::SpecialAttackType);
 		}
 
 		// Finds first attack type to telegraph
-		EAttackType FirstAttackType = AttackRostaArray[0]->AttackType;
+		EAttackType FirstAttackType = AttackRosterArray[0];
 		float FirstTelegraphTime = 0.f;
-		switch (AttackRostaArray[0]->AttackType)
+		switch (FirstAttackType)
 		{
 		case EAttackType::ProjectileAttackType: FirstTelegraphTime = ProjectileTelegraphTime; break;
 		case EAttackType::BeamAttackType: FirstTelegraphTime = BeamTelegraphTime; break;
@@ -60,17 +62,16 @@ void AMusicManager::BeginPlay()
 		default: break;
 		}
 
+		// Starts the attacks
 		FTimerHandle StartAttackingTimer;
 		FTimerDelegate StartAttackingDelegate;
-		StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType, AttackRostaArray);
+		StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType, AttackRosterArray);
 		GetWorld()->GetTimerManager().SetTimer(StartAttackingTimer, StartAttackingDelegate, FirstTelegraphTime, false);
 	}
-
-
 }
 
 // Called when the boss needs to be told to attack
-void AMusicManager::PrepareForAttack(EAttackType MMAttackType, TArray<FAttackRosta> Rosta)
+void AMusicManager::PrepareForAttack(EAttackType MMAttackType, TArray<EAttackType> Roster)
 {
 	FTimerHandle TelegraphHandle;
 	FTimerDelegate TelegraphDelegate;
@@ -87,24 +88,24 @@ void AMusicManager::PrepareForAttack(EAttackType MMAttackType, TArray<FAttackRos
 
 	EntryToRead++;
 
-	if(Rosta[EntryToRead].AttackType != EAttackType::NoneAttackType)
+	if(Roster[EntryToRead] != EAttackType::NoneAttackType)
 	{
-		SetupNextAttack(Rosta);
+		SetupNextAttack(Roster);
 	}
 	
 }
 
 // Called when the Music Manager needs to cue the next telegraph
-void AMusicManager::SetupNextAttack(TArray<FAttackRosta> Rosta)
+void AMusicManager::SetupNextAttack(TArray<EAttackType> Roster)
 {
 	FTimerHandle SetupHandle;
 	FTimerDelegate SetupDelegate;
 	float SetupTime = 0;
-	switch(Rosta[EntryToRead].AttackType)
+	switch(Roster[EntryToRead])
 	{
-	case EAttackType::ProjectileAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::ProjectileAttackType, Rosta); SetupTime = OncomingBarSpawnFrequency - ProjectileTelegraphTime; break;
-	case EAttackType::BeamAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::BeamAttackType, Rosta); SetupTime = OncomingBarSpawnFrequency - BeamTelegraphTime; break;
-	case EAttackType::WaveAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::WaveAttackType, Rosta); SetupTime = OncomingBarSpawnFrequency - WaveTelegraphTime; break;
+	case EAttackType::ProjectileAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::ProjectileAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - ProjectileTelegraphTime; break;
+	case EAttackType::BeamAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::BeamAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - BeamTelegraphTime; break;
+	case EAttackType::WaveAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::WaveAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - WaveTelegraphTime; break;
 	default: break;
 	}
 

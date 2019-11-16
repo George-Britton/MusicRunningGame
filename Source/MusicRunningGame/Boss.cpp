@@ -49,23 +49,12 @@ void ABoss::Tick(float DeltaTime)
 
 }
 
-// Called on every bar of music for the attack
-void ABoss::Attack(EAttackType BossAttackType)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("BossAttack"));
 
-	switch (BossAttackType)
-	{
-	case EAttackType::ProjectileAttackType : SpawnProjectile(); break;
-	case EAttackType::BeamAttackType : SpawnBeam(); break;
-	case EAttackType::WaveAttackType : SpawnWave(); break;
-	}
-}
 void ABoss::TelegraphProjectile(float WaitTime)
 {
 	FTimerHandle ProjectileTimer;
 	FTimerDelegate ProjectileDelegate;
-	GetWorld()->GetTimerManager().SetTimer(ProjectileTimer, ProjectileDelegate, WaitTime ,false);
+	GetWorld()->GetTimerManager().SetTimer(ProjectileTimer, ProjectileDelegate, WaitTime, false);
 }
 void ABoss::SpawnProjectile()
 {
@@ -86,12 +75,14 @@ void ABoss::TelegraphBeam(float WaitTime)
 	const FRotator SpawnRot(FQuat::Identity);
 	FActorSpawnParameters SpawnParams;
 
-	TargetRef = GetWorld()->SpawnActor<AProjectile>(TargetClass, SpawnLoc, SpawnRot, SpawnParams);
+	ATarget* TargetRef = GetWorld()->SpawnActor<ATarget>(TargetClass, SpawnLoc, SpawnRot, SpawnParams);
+	TargetRef->TargetMesh = TargetMesh;
 	FTimerHandle BeamTimer;
 	FTimerDelegate BeamDelegate;
+	BeamDelegate.BindUFunction(this, FName("SpawnBeam"), TargetRef);
 	GetWorld()->GetTimerManager().SetTimer(BeamTimer, BeamDelegate, WaitTime ,false);
 }
-void ABoss::SpawnBeam()
+void ABoss::SpawnBeam(ATarget* Target)
 {
 	const FVector SpawnLoc = GetActorLocation();
 	const FRotator SpawnRot(FQuat::Identity);
@@ -99,7 +90,7 @@ void ABoss::SpawnBeam()
 
 	// Gets a reference to the new projectile and gives it the preset variables
 	ABeam* BeamRef = GetWorld()->SpawnActor<ABeam>(BeamAttack.AttackActor, SpawnLoc, SpawnRot, SpawnParams);
-	TargetRef->Destroy();
+	if(Target) Target->Destroy();
 	BeamRef->Mesh = BeamAttack.AttackMesh;
 	BeamRef->Damage = BeamAttack.AttackDamage;
 	BeamRef->Duration = BeamAttack.AttackDuration;

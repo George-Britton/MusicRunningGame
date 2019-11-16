@@ -16,16 +16,16 @@ class AOncomingBarSpawner;
 
 // Struct that holds the upcoming attack information
 USTRUCT(BlueprintType)
-struct FAttackRosta
+struct FAttackRoster
 {
     GENERATED_USTRUCT_BODY()
  
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EAttackType AttackType;
+    FString AttackType;
 
-	FAttackRosta()
+	FAttackRoster()
 	{
-		AttackType = EAttackType::NoneAttackType;
+		AttackType = "";
 	}
 
 };
@@ -51,8 +51,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
 		USoundCue* Song;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attacks")
-		UDataTable* AttackRosta;
-		TArray<FAttackRosta*> AttackRostaArray;
+		UDataTable* AttackRoster;
+		TArray<EAttackType> AttackRosterArray;
+
 
 	// Timer for attacks
 	UPROPERTY()
@@ -91,11 +92,11 @@ protected:
 public:
 	// Called when the boss needs to telegraph
 	UFUNCTION()
-		void PrepareForAttack(EAttackType MMAttackType, TArray<FAttackRosta> Rosta);
+		void PrepareForAttack(EAttackType MMAttackType, TArray<EAttackType> Roster);
 
 	// Called when the Music Manager needs to cue the next telegraph
 	UFUNCTION()
-		void SetupNextAttack(TArray<FAttackRosta> Rosta);
+		void SetupNextAttack(TArray<EAttackType> Roster);
 
 	// Called when an oncoming bar needs to be spawned
 	UFUNCTION()

@@ -40,9 +40,9 @@ void AOncomingBarSpawner::BeginPlay()
 {
 	// Makes sure the Bar array is full
 	bool ArrayCleansed = false;
-	while(!ArrayCleansed)
+	while(!ArrayCleansed && BarDetails.Num() > 0)
 	{
-		if (!BarDetails[BarDetails.Num() - 1].BarMesh || BarDetails[BarDetails.Num() - 1].Key.GetFName() == "None" || !BarDetails[BarDetails.Num() - 1].Damage)
+		if (!BarDetails[BarDetails.Num() - 1].BarMesh || BarDetails[BarDetails.Num() - 1].KeyToPress.GetFName() == "None" || !BarDetails[BarDetails.Num() - 1].Damage)
 		{
 			BarDetails.Pop();
 		}else
@@ -59,11 +59,11 @@ void AOncomingBarSpawner::BeginPlay()
 
 		switch (ActiveSpawners)
 		{
-		case 3: ConnectionBarRef->TertiaryKey = BarDetails[2].Key;
+		case 3: ConnectionBarRef->TertiaryKey = BarDetails[2].KeyToPress;
 				TertiaryStaticMeshComponent->SetStaticMesh(BarDetails[2].BarMesh);
-		case 2: ConnectionBarRef->SecondaryKey = BarDetails[1].Key;
+		case 2: ConnectionBarRef->SecondaryKey = BarDetails[1].KeyToPress;
 				SecondaryStaticMeshComponent->SetStaticMesh(BarDetails[1].BarMesh);
-		case 1: ConnectionBarRef->PrimaryKey = BarDetails[0].Key;
+		case 1: ConnectionBarRef->PrimaryKey = BarDetails[0].KeyToPress;
 				PrimaryStaticMeshComponent->SetStaticMesh(BarDetails[0].BarMesh);
 				MeshesSet = true;
 				break;

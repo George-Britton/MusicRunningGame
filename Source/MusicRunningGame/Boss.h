@@ -9,6 +9,7 @@
 #include "Projectile.h"
 #include "Beam.h"
 #include "Wave.h"
+#include "Target.h"
 #include "Boss.generated.h"
 
 class AMusicManager;
@@ -71,10 +72,10 @@ public:
 		AMusicManager* MusicManagerReference;
 
 	// Static mesh for the target
-	UPROPERTY(EditAnywhere, Category = "Attacks")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UClass* TargetClass;
-	UPROPERTY()
-		AActor* TargetRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* TargetMesh;
 
 	// The boss' attack variables
 	UPROPERTY(EditAnywhere, Category = "Attacks")
@@ -103,15 +104,13 @@ public:
 
 	// Called on every bar of music for the attack
 	UFUNCTION()
-		void Attack(EAttackType AttackType);
-	UFUNCTION()
 		void TelegraphProjectile(float WaitTime);
 	UFUNCTION()
 		void SpawnProjectile();
 	UFUNCTION()
 		void TelegraphBeam(float WaitTime);
 	UFUNCTION()
-		void SpawnBeam();
+		void SpawnBeam(ATarget* Target);
 	UFUNCTION()
 		void TelegraphWave(float WaitTime);
 	UFUNCTION()

@@ -21,7 +21,7 @@ struct FBarData
 		UStaticMesh* BarMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FKey Key;
+		FKey KeyToPress;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Damage;
@@ -29,7 +29,7 @@ struct FBarData
 	FBarData()
 	{
 		BarMesh = nullptr;
-		FKey Key;
+		FKey KeyToPress;
 		Damage = 0;
 	}
 
