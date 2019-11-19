@@ -22,6 +22,16 @@ ABoss::ABoss()
 void ABoss::OnConstruction(const FTransform &trans)
 {
 	if (BossBallTemp){BossBallTempComponent->SetStaticMesh(BossBallTemp);}
+
+	if (MusicManagerReference)
+	{
+		ProjectileAttack.AttackTelegraphTime = FMath::Clamp(ProjectileAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+		BeamAttack.AttackTelegraphTime = FMath::Clamp(BeamAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+		WaveAttack.AttackTelegraphTime = FMath::Clamp(WaveAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+		MeleeAttack.AttackTelegraphTime = FMath::Clamp(MeleeAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+		ConeAttack.AttackTelegraphTime = FMath::Clamp(ConeAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+		SpecialAttack.AttackTelegraphTime = FMath::Clamp(SpecialAttack.AttackTelegraphTime, 0.f, (60/MusicManagerReference->BPM) - 0.00001f);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,11 +59,11 @@ void ABoss::Tick(float DeltaTime)
 
 }
 
-
 void ABoss::TelegraphProjectile(float WaitTime)
 {
 	FTimerHandle ProjectileTimer;
 	FTimerDelegate ProjectileDelegate;
+	ProjectileDelegate.BindUFunction(this, FName("SpawnProjectile"));
 	GetWorld()->GetTimerManager().SetTimer(ProjectileTimer, ProjectileDelegate, WaitTime, false);
 }
 void ABoss::SpawnProjectile()
@@ -71,6 +81,7 @@ void ABoss::SpawnProjectile()
 }
 void ABoss::TelegraphBeam(float WaitTime)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, "Telegraph Beam");
 	const FVector SpawnLoc = PlayerReference->GetActorLocation();
 	const FRotator SpawnRot(FQuat::Identity);
 	FActorSpawnParameters SpawnParams;
@@ -80,7 +91,7 @@ void ABoss::TelegraphBeam(float WaitTime)
 	FTimerHandle BeamTimer;
 	FTimerDelegate BeamDelegate;
 	BeamDelegate.BindUFunction(this, FName("SpawnBeam"), TargetRef);
-	GetWorld()->GetTimerManager().SetTimer(BeamTimer, BeamDelegate, WaitTime ,false);
+	GetWorld()->GetTimerManager().SetTimer(BeamTimer, BeamDelegate, WaitTime, false);
 }
 void ABoss::SpawnBeam(ATarget* Target)
 {
@@ -100,7 +111,8 @@ void ABoss::TelegraphWave(float WaitTime)
 {
 	FTimerHandle WaveTimer;
 	FTimerDelegate WaveDelegate;
-	GetWorld()->GetTimerManager().SetTimer(WaveTimer, WaveDelegate, WaitTime ,false);
+	WaveDelegate.BindUFunction(this, FName("SpawnWave"));
+	GetWorld()->GetTimerManager().SetTimer(WaveTimer, WaveDelegate, WaitTime, false);
 }
 void ABoss::SpawnWave()
 {

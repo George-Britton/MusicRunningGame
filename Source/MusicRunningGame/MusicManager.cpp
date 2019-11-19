@@ -18,7 +18,6 @@ AMusicManager::AMusicManager()
 
 }
 
-
 // Called when the game starts or when spawned
 void AMusicManager::BeginPlay()
 {
@@ -33,8 +32,8 @@ void AMusicManager::BeginPlay()
 	}
 
 	// Check Roster is loaded in
-	if (AttackRoster) {
-
+	if (AttackRoster)
+	{
 		// Gets the row numbers of Roster
 		TArray<TArray<FString>> AttackStringArray = AttackRoster->GetTableData();
 		
@@ -47,6 +46,7 @@ void AMusicManager::BeginPlay()
 			else if (AttackStringArray[RosterFiller][1] == FString("MeleeAttackType")) AttackRosterArray.Add(EAttackType::MeleeAttackType);
 			else if (AttackStringArray[RosterFiller][1] == FString("SpecialAttackType")) AttackRosterArray.Add(EAttackType::SpecialAttackType);
 		}
+		AttackRosterArray.Add(EAttackType::NoneAttackType);
 
 		// Finds first attack type to telegraph
 		EAttackType FirstAttackType = AttackRosterArray[0];
@@ -65,50 +65,62 @@ void AMusicManager::BeginPlay()
 		// Starts the attacks
 		FTimerHandle StartAttackingTimer;
 		FTimerDelegate StartAttackingDelegate;
-		StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType, AttackRosterArray);
+		StartAttackingDelegate.BindUFunction(this, FName("PrepareForAttack"), FirstAttackType);
 		GetWorld()->GetTimerManager().SetTimer(StartAttackingTimer, StartAttackingDelegate, FirstTelegraphTime, false);
+
+		if(Song)
+		{
+			MusicPlayer->SetSound(Song);
+			MusicPlayer->Play();
+		}
 	}
 }
 
 // Called when the boss needs to be told to attack
-void AMusicManager::PrepareForAttack(EAttackType MMAttackType, TArray<EAttackType> Roster)
+void AMusicManager::PrepareForAttack(EAttackType MMAttackType)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, "Prepare");
 	FTimerHandle TelegraphHandle;
 	FTimerDelegate TelegraphDelegate;
+	FName FunctionCall;
+	float Delay = 0;
 	float TelegraphTime = 0;
 	switch(MMAttackType)
 	{
-	case EAttackType::ProjectileAttackType: TelegraphDelegate.BindUFunction(BossReference, FName("TelegraphProjectile"), (OncomingBarSpawnFrequency - ProjectileTelegraphTime)); TelegraphTime = ProjectileTelegraphTime; break;
-	case EAttackType::BeamAttackType: TelegraphDelegate.BindUFunction(BossReference, FName("TelegraphBeam"), (OncomingBarSpawnFrequency - BeamTelegraphTime)); TelegraphTime = BeamTelegraphTime; break;
-	case EAttackType::WaveAttackType: TelegraphDelegate.BindUFunction(BossReference, FName("TelegraphWave"), (OncomingBarSpawnFrequency - WaveTelegraphTime)); TelegraphTime = WaveTelegraphTime; break;
+	case EAttackType::ProjectileAttackType: FunctionCall = "TelegraphProjectile"; Delay = OncomingBarSpawnFrequency - ProjectileTelegraphTime; TelegraphTime = ProjectileTelegraphTime; break;
+	case EAttackType::BeamAttackType: FunctionCall = "TelegraphBeam"; Delay = OncomingBarSpawnFrequency - BeamTelegraphTime; TelegraphTime = BeamTelegraphTime; break;
+	case EAttackType::WaveAttackType:  FunctionCall = "TelegraphWave"; Delay = OncomingBarSpawnFrequency - WaveTelegraphTime; TelegraphTime = WaveTelegraphTime; break;
 	default: break;
 	}
 
+	TelegraphDelegate.BindUFunction(BossReference, FunctionCall, Delay);
 	GetWorld()->GetTimerManager().SetTimer(TelegraphHandle, TelegraphDelegate, TelegraphTime, false);
 
 	EntryToRead++;
 
-	if(Roster[EntryToRead] != EAttackType::NoneAttackType)
+	if(AttackRosterArray[EntryToRead] != EAttackType::NoneAttackType)
 	{
-		SetupNextAttack(Roster);
+		SetupNextAttack();
 	}
-	
 }
 
 // Called when the Music Manager needs to cue the next telegraph
-void AMusicManager::SetupNextAttack(TArray<EAttackType> Roster)
+void AMusicManager::SetupNextAttack()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Yellow, "Setup");
 	FTimerHandle SetupHandle;
 	FTimerDelegate SetupDelegate;
+	EAttackType NextAttack;
 	float SetupTime = 0;
-	switch(Roster[EntryToRead])
+	switch(AttackRosterArray[EntryToRead])
 	{
-	case EAttackType::ProjectileAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::ProjectileAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - ProjectileTelegraphTime; break;
-	case EAttackType::BeamAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::BeamAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - BeamTelegraphTime; break;
-	case EAttackType::WaveAttackType: SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), EAttackType::WaveAttackType, Roster); SetupTime = OncomingBarSpawnFrequency - WaveTelegraphTime; break;
+	case EAttackType::ProjectileAttackType: NextAttack = EAttackType::ProjectileAttackType; SetupTime = OncomingBarSpawnFrequency - ProjectileTelegraphTime; break;
+	case EAttackType::BeamAttackType: NextAttack = EAttackType::BeamAttackType; SetupTime = OncomingBarSpawnFrequency - BeamTelegraphTime; break;
+	case EAttackType::WaveAttackType: NextAttack = EAttackType::WaveAttackType; SetupTime = OncomingBarSpawnFrequency - WaveTelegraphTime; break;
 	default: break;
-	}
+	}	
 
+	SetupDelegate.BindUFunction(this, FName("PrepareForAttack"), NextAttack);
 	GetWorld()->GetTimerManager().SetTimer(SetupHandle, SetupDelegate, SetupTime, false);
 }
 

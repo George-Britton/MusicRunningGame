@@ -27,7 +27,6 @@ struct FAttackRoster
 	{
 		AttackType = "";
 	}
-
 };
 
 UCLASS()
@@ -41,7 +40,7 @@ public:
 
 	// BPM of the song
 	UPROPERTY(EditAnywhere, Category = "Music")
-		float BPM;
+		float BPM = 60;
 	UPROPERTY()
 		float OncomingBarSpawnFrequency;
 
@@ -90,13 +89,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	
 	// Called when the boss needs to telegraph
 	UFUNCTION()
-		void PrepareForAttack(EAttackType MMAttackType, TArray<EAttackType> Roster);
+		void PrepareForAttack(EAttackType MMAttackType);
 
 	// Called when the Music Manager needs to cue the next telegraph
 	UFUNCTION()
-		void SetupNextAttack(TArray<EAttackType> Roster);
+		void SetupNextAttack();
 
 	// Called when an oncoming bar needs to be spawned
 	UFUNCTION()
